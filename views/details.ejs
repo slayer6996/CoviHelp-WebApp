@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+    <title>Home page</title>
+  </head>
+  <body>
+    <nav class="navbar navbar-light bg-light">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="/">CoviHelp</a>
+        </div>
+      </nav>
+
+    <div class="main">
+        <div class="row">
+            <div class="options col-12 col-md-3 col-sm-12">
+                <div class="row">
+                    <h2>Search for resources</h2>
+                    <form action="/searchResource" method="post">
+                        <div class="mb-3">
+                            <label for="city" class="form-label">City</label>
+                            <input type="text" class="form-control" id="city" name="city" placeholder="City Name">
+                            <button type="submit" class="btn btn-primary">Search</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="row">
+                    <h2>Help others</h2>
+                    <p>Do you have spare resources like medicines or oxygen cylinders? Help those who need it.</p>
+                    <a href="/postResources"><button class="btn btn-warning">Help</button></a>
+                </div>
+            </div>
+            <div class="details col-12 col-md-9 col-sm-12">
+                <% foundDetails.forEach(function(detail){ %>
+                    <div class="detail">
+                        <h5>Name:</h5>
+                        <p><%=detail.name%></p>
+                        <h3><%=detail.resource%></h3>
+                        <h4>City</h4>
+                        <p><%=detail.city%></p>
+                        <h5><%=detail.contact%></h5>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+    </div>
+ 
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+  </body>
+</html>
