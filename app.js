@@ -2,6 +2,8 @@ const express = require("express")
 const bodyParser = require("body-parser")
 const mongoose = require("mongoose")
 mongoose.connect("mongodb://localhost:27017/resourcesDB", {useNewUrlParser:true, useUnifiedTopology:true})
+const bcrypt=require("bcrypt")
+const saltRounds = 10;
 
 const app = express()
 
@@ -9,6 +11,7 @@ app.use(express.static("public"))
 app.set("view engine", "ejs")
 app.use(bodyParser.urlencoded({extended:true}))
 
+//All the resources visible to users will be from this collection 
 
 const detailsScehma = new mongoose.Schema({
     name: {type: String, required: true},
@@ -18,6 +21,25 @@ const detailsScehma = new mongoose.Schema({
 })
 
 const Detail = new mongoose.model("Detail", detailsScehma)
+
+//details posted by others user yet to be confirmed will be saved in this collection 
+
+const pendingDetailsSchema = new mongoose.Schema({
+    name: {type: String, required: true},
+    resource: {type: String, required: true},
+    city:{type: String, required: true},
+    contact:{type: Number, required: true}
+})
+
+const pendingDetail = new mongoose.model("pendingDetail", pendingDetailsSchema)
+
+//details of admin who will be having access to the pending details as well as confirmed details
+const adminSchema = new mongoose.Schema({
+    username: String,
+    password: String
+})
+
+const Admin = new mongoose.Schema("Admin", adminSchema)
 
 app.get("/", function(req,res){
     Detail.find({}, function(err, foundDetails){
@@ -45,7 +67,8 @@ app.get("/postResources", function(req,res){
 })
 
 app.post("/postResources", function(req,res){
-    const post = new Detail({
+    //details posted by user wil wait for verification from admin
+    const post = new pendingDetail({
         name:req.body.name,
         resource: req.body.resource,
         city:req.body.city,
@@ -53,6 +76,110 @@ app.post("/postResources", function(req,res){
     })
     post.save()
     res.redirect("/")
+})
+
+//load the admin login page
+app.get("/adminLogin", function(req,res){
+    res.render("login")
+})
+
+//login for admin
+app.post("/adminLogin", function(req,res){
+    const username=req.body.username
+    const password=req.body.password
+    // Load hash from your password DB.
+    bcrypt.compare(password, hash, function(err, result) {
+        if(err){
+            console.log(err)
+        } else if(result == true){
+            res.redirect("/posts")
+        } else if(result == false){
+            res.redirect("/login")
+        }
+    });
+})
+
+//this page will be visible to the admin from where verified and pending posts can be viewed.
+app.get("/adminPage", function(req,res){
+    res.render("adminPage")
+})
+
+//this option on the adminpage will render all the verified details along with delete option
+app.post("/verifiedDetails",function(req,res){
+    Detail.find({}, function(err, foundDetails){
+        if(err){
+            console.log(err)
+        }else{
+            res.render("verifiedDetails", {foundDetails:foundDetails})
+        }
+    })
+})
+
+//when the admin attempts to delete any of the verified details from the DB
+app.post("/deleteDetails", function(req,res){
+    const deletedDetailsId=req.body.id;
+    Details.deleteOne({id:deletedDetailsId}, function(err){
+        if(err){
+            console.log(err)
+        } else{
+            //after successful deletion the list of verified details will appear again 
+            res.redirect("/verifiedDetails")
+        }
+    })
+})
+
+//this will enable the admin to view all the pending details
+app.post("/pendingDetails", function(req,res){
+    pendingDetail.find({}, function(err, foundDetails){
+        if(err){
+            console.log(err)
+        }else{
+            res.render("pendingDetails", {foundDetails:foundDetails})
+        }
+    })
+})
+
+//when admin deletes one of the pending details
+app.post("/deletePendingDetails", function(req,res){
+    const deletedDetailsId=req.body.id;
+    pendingDetail.deleteOne({id:deletedDetailsId}, function(err){
+        if(err){
+            console.log(err)
+        } else{
+            //after successful deletion the list of pending details will appear again 
+            res.redirect("/pendingDetails")
+        }
+    })
+})
+
+//when admin verifies one of the pending details, it needs to move to the verified details DB 
+app.post("/verification", function(req,res){
+    //get the id of verified detail
+    const verifiedDetailId=req.body.id
+    //search for the detail in the DB
+    pendingDetail.find({id:verifiedDetailId}, function(err, foundDetails){
+        if(err){
+            console.log(err)
+        }else{
+            //save the found details as verified details 
+            const verifiedDetail = new Detail({
+                name: foundDetails.name ,
+                resource: foundDetails.resource ,
+                city:foundDetails.city,
+                contact: foundDetails.contact
+            })
+            verifiedDetail.save()
+
+            //after successfully moving selected details to verified details DB , delete it from pending details DB
+            pendingDetail.deleteOne({id:verifiedDetailId}, function(err){
+                if(err){
+                    console.log(err)
+                } else{
+                    res.redirect("/pendingDetails")
+                }
+            })
+        }
+    })
 })
 
 let port = process.env.PORT;
