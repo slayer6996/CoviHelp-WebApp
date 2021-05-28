@@ -39,7 +39,7 @@ const adminSchema = new mongoose.Schema({
     password: String
 })
 
-const Admin = new mongoose.Schema("Admin", adminSchema)
+const Admin = new mongoose.model("Admin", adminSchema)
 
 app.get("/", function(req,res){
     Detail.find({}, function(err, foundDetails){
@@ -92,7 +92,7 @@ app.post("/adminLogin", function(req,res){
         if(err){
             console.log(err)
         } else if(result == true){
-            res.redirect("/posts")
+            res.redirect("/adminPage")
         } else if(result == false){
             res.redirect("/login")
         }
