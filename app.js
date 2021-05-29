@@ -104,9 +104,31 @@ app.get("/adminPage", function(req,res){
     res.render("adminPage")
 })
 
+app.get("/viewVerifiedDetails", function(req,res){
+    Detail.find({}, function(err, foundDetails){
+        if(err){
+            console.log(err)
+        }else{
+            res.render("verifiedDetails", {foundDetails:foundDetails})
+        }
+    })
+})
+
+app.get("/viewPendingDetails", function(req,res){
+    pendingDetail.find({}, function(err, foundDetails){
+        if(err){
+            console.log(err)
+        }else{
+            res.render("pendingDetails", {foundDetails:foundDetails})
+        }
+    })
+})
+
 //this option on the adminpage will render all the verified details along with delete option
 app.post("/verifiedDetails",function(req,res){
-    Detail.find({}, function(err, foundDetails){
+    const requestedCity=req.body.city;
+
+    Detail.find({city:requestedCity}, function(err, foundDetails){
         if(err){
             console.log(err)
         }else{

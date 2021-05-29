@@ -37,3 +37,12 @@ body{
         padding-top: 1rem;
     }
 }
+
+.adminPage_main{
+    background-color: white;
+    border-radius: 20px;
+    text-align: center;
+    margin: 2rem auto;
+    width: fit-content;
+    padding: 3rem;
+}
