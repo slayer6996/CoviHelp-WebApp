@@ -32,14 +32,17 @@
         <div class="row">
             <div class="details col-12 col-md-9 col-sm-12">
                 <% foundDetails.forEach(function(detail){ %>
-                    <div class="detail">
-                        <h5>Name:</h5>
-                        <p><%=detail.name%></p>
-                        <h3><%=detail.resource%></h3>
-                        <h4>City</h4>
-                        <p><%=detail.city%></p>
-                        <h5><%=detail.contact%></h5>
-                    </div>
+                    <form action="/deleteDetails" method="post">
+                        <div class="detail">
+                            <h5>Name:</h5>
+                            <p><%=detail.name%></p>
+                            <h3><%=detail.resource%></h3>
+                            <h4>City</h4>
+                            <p><%=detail.city%></p>
+                            <h5><%=detail.contact%></h5>
+                            <button name="id" type="submit" value="<%=detail._id%>" class="btn btn-outline-danger">Delete</button>
+                        </div>
+                    </form>
                 <% }) %>
             </div>
         </div>

@@ -63,7 +63,7 @@ app.post("/searchResource",function(req,res){
 })
 
 app.get("/postResources", function(req,res){
-    res.render("post")
+    res.render("posts")
 })
 
 app.post("/postResources", function(req,res){
@@ -140,12 +140,13 @@ app.post("/verifiedDetails",function(req,res){
 //when the admin attempts to delete any of the verified details from the DB
 app.post("/deleteDetails", function(req,res){
     const deletedDetailsId=req.body.id;
-    Details.deleteOne({id:deletedDetailsId}, function(err){
+    console.log(deletedDetailsId)
+    Detail.deleteOne({_id:deletedDetailsId}, function(err){
         if(err){
             console.log(err)
         } else{
             //after successful deletion the list of verified details will appear again 
-            res.redirect("/verifiedDetails")
+            res.redirect("/viewVerifiedDetails")
         }
     })
 })
@@ -164,7 +165,7 @@ app.post("/pendingDetails", function(req,res){
 //when admin deletes one of the pending details
 app.post("/deletePendingDetails", function(req,res){
     const deletedDetailsId=req.body.id;
-    pendingDetail.deleteOne({id:deletedDetailsId}, function(err){
+    pendingDetail.deleteOne({_id:deletedDetailsId}, function(err){
         if(err){
             console.log(err)
         } else{
@@ -179,7 +180,7 @@ app.post("/verification", function(req,res){
     //get the id of verified detail
     const verifiedDetailId=req.body.id
     //search for the detail in the DB
-    pendingDetail.find({id:verifiedDetailId}, function(err, foundDetails){
+    pendingDetail.find({_id:verifiedDetailId}, function(err, foundDetails){
         if(err){
             console.log(err)
         }else{
@@ -190,17 +191,17 @@ app.post("/verification", function(req,res){
                 city:foundDetails.city,
                 contact: foundDetails.contact
             })
+            console.log("saving this into verified details directory")
             verifiedDetail.save()
-
+        }
             //after successfully moving selected details to verified details DB , delete it from pending details DB
-            pendingDetail.deleteOne({id:verifiedDetailId}, function(err){
+            pendingDetail.deleteOne({_id:verifiedDetailId}, function(err){
                 if(err){
                     console.log(err)
                 } else{
-                    res.redirect("/pendingDetails")
+                    res.redirect("/viewPendingDetails")
                 }
             })
-        }
     })
 })
 
