@@ -24,14 +24,7 @@ const Detail = new mongoose.model("Detail", detailsScehma)
 
 //details posted by others user yet to be confirmed will be saved in this collection 
 
-const pendingDetailsSchema = new mongoose.Schema({
-    name: {type: String, required: true},
-    resource: {type: String, required: true},
-    city:{type: String, required: true},
-    contact:{type: Number, required: true}
-})
-
-const pendingDetail = new mongoose.model("pendingDetail", pendingDetailsSchema)
+const pendingDetail = new mongoose.model("pendingDetail", detailsScehma)
 
 //details of admin who will be having access to the pending details as well as confirmed details
 const adminSchema = new mongoose.Schema({
@@ -180,28 +173,21 @@ app.post("/verification", function(req,res){
     //get the id of verified detail
     const verifiedDetailId=req.body.id
     //search for the detail in the DB
-    pendingDetail.find({_id:verifiedDetailId}, function(err, foundDetails){
+    pendingDetail.findOne({_id:verifiedDetailId}, function(err,foundDetails){
+        const temp = new Detail({
+            name:foundDetails.name,
+            resource:foundDetails.resource,
+            city:foundDetails.city,
+            contact:foundDetails.contact
+        })
+        temp.save()
+    })
+    pendingDetail.deleteOne({_id:verifiedDetailId}, function(err){
         if(err){
             console.log(err)
-        }else{
-            //save the found details as verified details 
-            const verifiedDetail = new Detail({
-                name: foundDetails.name ,
-                resource: foundDetails.resource ,
-                city:foundDetails.city,
-                contact: foundDetails.contact
-            })
-            console.log("saving this into verified details directory")
-            verifiedDetail.save()
+        } else{
+            console.log("successfully deleted")
         }
-            //after successfully moving selected details to verified details DB , delete it from pending details DB
-            pendingDetail.deleteOne({_id:verifiedDetailId}, function(err){
-                if(err){
-                    console.log(err)
-                } else{
-                    res.redirect("/viewPendingDetails")
-                }
-            })
     })
 })
 
