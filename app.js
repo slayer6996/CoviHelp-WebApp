@@ -174,6 +174,7 @@ app.post("/verification", function(req,res){
     const verifiedDetailId=req.body.id
     //search for the detail in the DB
     pendingDetail.findOne({_id:verifiedDetailId}, function(err,foundDetails){
+        //added document to verified details collection 
         const temp = new Detail({
             name:foundDetails.name,
             resource:foundDetails.resource,
@@ -182,6 +183,7 @@ app.post("/verification", function(req,res){
         })
         temp.save()
     })
+    //deleted the detail from pending details collection
     pendingDetail.deleteOne({_id:verifiedDetailId}, function(err){
         if(err){
             console.log(err)
