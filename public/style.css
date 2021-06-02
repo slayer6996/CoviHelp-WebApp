@@ -2,6 +2,10 @@ body{
     background-color: rgb(200, 228, 200);
 }
 
+.navbar{
+    position: sticky;
+}
+
 .main{
     background-color: white;
     border-radius: 15px;
@@ -25,6 +29,9 @@ body{
     background-color: rgb(252, 255, 203);
     color: black;
     height: fit-content;
+    min-width: 15rem;
+    min-height: 15rem;
+    margin-bottom: 1rem;
     padding: 0.5rem 2rem 0.5rem 2rem;
 }
 

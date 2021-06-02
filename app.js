@@ -76,21 +76,52 @@ app.get("/adminLogin", function(req,res){
     res.render("login")
 })
 
-//login for admin
+// login for admin
 app.post("/adminLogin", function(req,res){
-    const username=req.body.username
-    const password=req.body.password
-    // Load hash from your password DB.
-    bcrypt.compare(password, hash, function(err, result) {
+const username=req.body.username
+const password=req.body.password
+    Admin.findOne({username:username}, function(err,foundAdmin){
+        console.log("finding")
         if(err){
             console.log(err)
-        } else if(result == true){
-            res.redirect("/adminPage")
-        } else if(result == false){
-            res.redirect("/login")
+        } else{
+            if(foundAdmin){
+                console.log("found")
+                bcrypt.compare(password, foundAdmin.password, function(err, result) {
+                    if(err){
+                        console.log(err)
+                    } else if(result == true){
+                        res.redirect("/adminPage")
+                    } else if(result == false){
+                        alert("invalid username or password")
+                        res.redirect("/adminLogin")
+                    }
+                });
+            }
+            else{
+                        res.redirect("/adminLogin")
+            }
         }
-    });
+    })
 })
+
+//For creating a new admin
+// app.post("/adminLogin", function(req,res){
+//     bcrypt.hash(req.body.password, saltRounds, function(err,hash){
+//         const newAdmin= new Admin({
+//             username:req.body.username,
+//             password:hash
+//         })
+//         newAdmin.save(function(err){
+//             if(err){
+//                 console.log(err)
+//             }
+//             else{
+//                 console.log("Admin created")
+//             }
+//         })
+//     })
+// })
 
 //this page will be visible to the admin from where verified and pending posts can be viewed.
 app.get("/adminPage", function(req,res){
@@ -189,6 +220,7 @@ app.post("/verification", function(req,res){
             console.log(err)
         } else{
             console.log("successfully deleted")
+            res.redirect("/viewPendingDetails")
         }
     })
 })
